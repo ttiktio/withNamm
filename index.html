@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai-English Converter - Dark Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            color: rgba(203, 213, 225, 0.8);
+            font-size: 14px;
+        }
+
+        .language-selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 25px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .mode-toggle input[type="radio"] {
+            display: none;
+        }
+
+        .mode-label {
+            padding: 10px 20px;
+            background: rgba(15, 23, 42, 0.6);
+            color: rgba(226, 232, 240, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mode-toggle input[type="radio"]:checked + .mode-label {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .mode-label:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .manual-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .auto-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .auto-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .auto-arrow {
+            font-size: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        select {
+            appearance: none;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            padding: 12px 40px 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        select:hover {
+            background: rgba(30, 41, 59, 1);
+            border-color: rgba(148, 163, 184, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            font-size: 12px;
+        }
+
+        .swap-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .swap-btn:hover {
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #f1f5f9;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #e2e8f0;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea::placeholder {
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        .output-textarea {
+            background: rgba(15, 23, 42, 0.8) !important;
+            cursor: pointer;
+        }
+
+        .output-textarea:hover {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-color: rgba(148, 163, 184, 0.5) !important;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(30, 41, 59, 1);
+            border-color: rgba(148, 163, 184, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .status-bar {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .status-text {
+            color: rgba(226, 232, 240, 0.9);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hotkeys {
+            font-size: 11px;
+            color: rgba(148, 163, 184, 0.7);
+            margin-top: 4px;
+        }
+
+        /* Floating particles animation */
+        .particle {
+            position: absolute;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+        }
+
+        /* Success animation */
+        .success-pulse {
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Copy feedback */
+        .copy-feedback {
+            position: absolute;
+            top: -40px;
+            right: 10px;
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: copyFeedback 2s ease-out forwards;
+        }
+
+        @keyframes copyFeedback {
+            0% { opacity: 0; transform: translateY(10px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .language-selector {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .button-row {
+                justify-content: center;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        /* Footer styles */
+        .footer-bar {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            color: #cbd5e1;
+            text-align: center;
+            padding: 18px 0 10px 0;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .footer-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: #fbbf24;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="top: 10%; left: 10%; width: 6px; height: 6px; animation-delay: 0s;"></div>
+    <div class="particle" style="top: 20%; right: 15%; width: 4px; height: 4px; animation-delay: 2s;"></div>
+    <div class="particle" style="bottom: 30%; left: 20%; width: 8px; height: 8px; animation-delay: 4s;"></div>
+    <div class="particle" style="top: 60%; right: 25%; width: 5px; height: 5px; animation-delay: 1s;"></div>
+    <div class="particle" style="bottom: 20%; right: 30%; width: 7px; height: 7px; animation-delay: 3s;"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🌙 Thai-English Converter</h1>
+            <p class="subtitle">แปลงข้อความระหว่างไทย-อังกฤษอย่างรวดเร็ว</p>
+        </div>
+
+        <div class="language-selector">
+            <div class="mode-toggle">
+                <input type="radio" id="manual-mode" name="mode" value="manual" checked>
+                <label for="manual-mode" class="mode-label">
+                    🎯 Manual Mode
+                </label>
+                
+                <input type="radio" id="auto-mode" name="mode" value="auto">
+                <label for="auto-mode" class="mode-label">
+                    🤖 Smart Auto Mode
+                </label>
+            </div>
+            
+            <div class="manual-controls" id="manualControls">
+                <div class="select-wrapper">
+                    <select id="fromLang">
+                        <option value="en">English</option>
+                        <option value="th">ไทย</option>
+                    </select>
+                </div>
+                
+                <button class="swap-btn" id="swapBtn" title="สลับภาษา">⇄</button>
+                
+                <div class="select-wrapper">
+                    <select id="toLang">
+                        <option value="th">ไทย</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="auto-indicator" id="autoIndicator" style="display: none;">
+                <div class="auto-text">
+                    🤖 <span id="detectedLang">ตรวจจับภาษาอัตโนมัติ</span>
+                    <div class="auto-arrow">→</div>
+                    <span id="targetLang">แปลงอัตโนมัติ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="section-title">
+                📝 ข้อความต้นฉบับ
+            </div>
+            <div class="textarea-wrapper">
+                <textarea 
+                    id="inputText" 
+                    placeholder="พิมพ์หรือวางข้อความที่ต้องการแปลงที่นี่..."
+                    autofocus
+                ></textarea>
+            </div>
+            <div class="button-row">
+                <button class="btn btn-secondary" id="pasteBtn">
+                    📋 วาง
+                </button>
+                <button class="btn btn-primary" id="convertBtn">
+                    ✨ แปลง
+                </button>
+                <button class="btn btn-danger" id="clearBtn">
+                    🗑️ ล้าง
+                </button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="section-title">
+                ✨ ผลลัพธ์
+            </div>
+            <div class="textarea-wrapper">
+                <textarea 
+                    id="outputText" 
+                    class="output-textarea"
+                    placeholder="ผลลัพธ์จะแสดงที่นี่..."
+                    readonly
+                ></textarea>
+            </div>
+            <div class="button-row">
+                <button class="btn btn-secondary" id="copyBtn">
+                    📋 คัดลอก
+                </button>
+                <button class="btn btn-secondary" id="selectAllBtn">
+                    📄 เลือกทั้งหมด
+                </button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-text" id="statusText">
+                🟢 พร้อมใช้งาน
+            </div>
+            <div class="hotkeys">
+                💡 Ctrl+V วาง • Ctrl+E แปลง • Ctrl+C คัดลอก • Enter แปลง • Tab สลับโหมด
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-bar">
+        <nav class="footer-nav">
+            <a href="#" class="footer-link">Power By RICK</a>
+            <!-- ตัวอย่างลิงก์ในอนาคต -->
+            <!-- <a href="about.html" class="footer-link">About</a> -->
+            <!-- <a href="contact.html" class="footer-link">Contact</a> -->
+        </nav>
+    </footer>
+
+    <script>
+        // Keyboard mapping tables
+        const TH2EN = {
+            'ๅ':'1','/':'2','-':'3','ภ':'4','ถ':'5','ุ':'6','ึ':'7','ค':'8','ต':'9','จ':'0','ข':'-','ช':'=',
+            'ๆ':'q','ไ':'w','ำ':'e','พ':'r','ะ':'t','ั':'y','ี':'u','ร':'i','น':'o','ย':'p','บ':'[','ล':']',
+            'ฟ':'a','ห':'s','ก':'d','ด':'f','เ':'g','้':'h','่':'j','า':'k','ส':'l','ว':';','ง':"'",
+            'ผ':'z','ป':'x','แ':'c','อ':'v','ิ':'b','ื':'n','ท':'m','ม':',','ใ':'.','ฝ':'/',
+            '๑':'!','๒':'@','๓':'#','๔':'$','๕':'%','๖':'^','๗':'&','๘':'*','๙':'(','๐':')',
+            'ฤ':'A','ฆ':'S','ฏ':'D','โ':'F','ฌ':'G','็':'H','๋':'J','ษ':'K','ศ':'L','ซ':':','ฒ':'"',
+        };
+
+        const EN2TH = {};
+        for (const [th, en] of Object.entries(TH2EN)) {
+            EN2TH[en] = th;
+        }
+        // Add specific mappings
+        Object.assign(EN2TH, {
+            '1':'ๅ','2':'/','3':'-','4':'ภ','5':'ถ','6':'ุ','7':'ึ','8':'ค','9':'ต','0':'จ',
+            '-':'ข','=':'ช','[':'บ',']':'ล',',':'ม','.':'ใ','/':'ฝ',
+        });
+
+        // Enhanced language detection
+        function detectLanguage(text) {
+            if (!text.trim()) return 'unknown';
+            
+            // Count Thai and English characters
+            let thaiCount = 0;
+            let englishCount = 0;
+            let totalChars = 0;
+            
+            for (const char of text) {
+                if (char.match(/[\u0E00-\u0E7F]/)) { // Thai Unicode range
+                    thaiCount++;
+                    totalChars++;
+                } else if (char.match(/[a-zA-Z]/)) { // English letters
+                    englishCount++;
+                    totalChars++;
+                }
+            }
+            
+            if (totalChars === 0) return 'mixed';
+            
+            const thaiPercent = thaiCount / totalChars;
+            const englishPercent = englishCount / totalChars;
+            
+            // If predominantly Thai
+            if (thaiPercent > 0.3) return 'th';
+            // If predominantly English  
+            if (englishPercent > 0.3) return 'en';
+            // If mixed or unclear, try to detect based on keyboard layout patterns
+            return detectByKeyboardPattern(text);
+        }
+        
+        function detectByKeyboardPattern(text) {
+            // Check if text looks like Thai typed on English keyboard
+            let englishKeyboardThaiCount = 0;
+            let thaiKeyboardEnglishCount = 0;
+            
+            for (const char of text) {
+                if (EN2TH[char]) englishKeyboardThaiCount++;
+                if (TH2EN[char]) thaiKeyboardEnglishCount++;
+            }
+            
+            if (englishKeyboardThaiCount > thaiKeyboardEnglishCount) {
+                return 'en'; // English keyboard typing Thai
+            } else if (thaiKeyboardEnglishCount > englishKeyboardThaiCount) {
+                return 'th'; // Thai keyboard typing English
+            }
+            
+            return 'mixed';
+        }
+
+        function smartConvert(text) {
+            const detected = detectLanguage(text);
+            let result = text;
+            let fromLang = 'unknown';
+            let toLang = 'unknown';
+            
+            switch (detected) {
+                case 'th':
+                    // Thai text -> convert to English
+                    result = convertText(text, TH2EN);
+                    fromLang = 'ไทย';
+                    toLang = 'English';
+                    break;
+                case 'en':
+                    // English text -> convert to Thai  
+                    result = convertText(text, EN2TH);
+                    fromLang = 'English';
+                    toLang = 'ไทย';
+                    break;
+                case 'mixed':
+                    // Mixed content - try both conversions and pick the best
+                    const toThai = convertText(text, EN2TH);
+                    const toEnglish = convertText(text, TH2EN);
+                    
+                    // Use heuristics to choose the best conversion
+                    if (text.match(/[a-zA-Z]/)) {
+                        result = toThai;
+                        fromLang = 'English (Mixed)';
+                        toLang = 'ไทย';
+                    } else {
+                        result = toEnglish;
+                        fromLang = 'ไทย (Mixed)';
+                        toLang = 'English';
+                    }
+                    break;
+                default:
+                    fromLang = 'ไม่ทราบ';
+                    toLang = 'ไม่ทราบ';
+            }
+            
+            return { result, fromLang, toLang };
+        }
+
+        // DOM elements
+        const fromLang = document.getElementById('fromLang');
+        const toLang = document.getElementById('toLang');
+        const swapBtn = document.getElementById('swapBtn');
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const convertBtn = document.getElementById('convertBtn');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const statusText = document.getElementById('statusText');
+        
+        // New mode elements
+        const manualMode = document.getElementById('manual-mode');
+        const autoMode = document.getElementById('auto-mode');
+        const manualControls = document.getElementById('manualControls');
+        const autoIndicator = document.getElementById('autoIndicator');
+        const detectedLang = document.getElementById('detectedLang');
+        const targetLang = document.getElementById('targetLang');
+
+        // Utility functions
+        function setStatus(message, emoji = '🟢') {
+            statusText.textContent = `${emoji} ${message}`;
+        }
+
+        function showCopyFeedback(element, message = 'คัดลอกแล้ว!') {
+            const feedback = document.createElement('div');
+            feedback.className = 'copy-feedback';
+            feedback.textContent = message;
+            element.style.position = 'relative';
+            element.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 2000);
+        }
+
+        function convertText(text, mapping) {
+            return text.split('').map(char => 
+                mapping[char] || mapping[char.toLowerCase()] || char
+            ).join('');
+        }
+
+        function performConversion() {
+            const input = inputText.value.trim();
+            if (!input) {
+                setStatus('ไม่มีข้อความที่จะแปลง', '⚠️');
+                return;
+            }
+
+            if (autoMode.checked) {
+                // Smart Auto Mode
+                const conversion = smartConvert(input);
+                outputText.value = conversion.result;
+                
+                // Update auto indicator
+                detectedLang.textContent = conversion.fromLang;
+                targetLang.textContent = conversion.toLang;
+                
+                setStatus('แปลงอัตโนมัติเรียบร้อยแล้ว', '🤖');
+            } else {
+                // Manual Mode
+                const from = fromLang.value;
+                const to = toLang.value;
+
+                if (from === to) {
+                    outputText.value = input;
+                    setStatus('ภาษาเดียวกัน - ไม่ต้องแปลง', 'ℹ️');
+                    return;
+                }
+
+                let result;
+                if (from === 'th' && to === 'en') {
+                    result = convertText(input, TH2EN);
+                } else if (from === 'en' && to === 'th') {
+                    result = convertText(input, EN2TH);
+                }
+
+                outputText.value = result;
+                setStatus('แปลงเรียบร้อยแล้ว', '✅');
+            }
+            
+            // Add success animation
+            document.querySelector('.container').classList.add('success-pulse');
+            setTimeout(() => {
+                document.querySelector('.container').classList.remove('success-pulse');
+            }, 600);
+        }
+
+        // Mode switching
+        function toggleMode() {
+            if (autoMode.checked) {
+                manualControls.style.display = 'none';
+                autoIndicator.style.display = 'flex';
+                swapBtn.style.display = 'none';
+                setStatus('เปลี่ยนเป็นโหมดอัตโนมัติ', '🤖');
+                
+                // Auto convert if there's input
+                if (inputText.value.trim()) {
+                    performConversion();
+                }
+            } else {
+                manualControls.style.display = 'flex';
+                autoIndicator.style.display = 'none';
+                swapBtn.style.display = 'block';
+                setStatus('เปลี่ยนเป็นโหมดแมนวล', '🎯');
+                
+                // Re-convert with manual mode if there's input
+                if (inputText.value.trim()) {
+                    performConversion();
+                }
+            }
+        }
+
+        // Event listeners
+        manualMode.addEventListener('change', toggleMode);
+        autoMode.addEventListener('change', toggleMode);
+        
+        convertBtn.addEventListener('click', performConversion);
+
+        swapBtn.addEventListener('click', () => {
+            const fromValue = fromLang.value;
+            fromLang.value = toLang.value;
+            toLang.value = fromValue;
+            performConversion();
+            setStatus('สลับภาษาแล้ว', '🔄');
+        });
+
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    inputText.value = text;
+                    inputText.focus();
+                    setStatus('วางข้อความแล้ว', '📋');
+                } else {
+                    setStatus('ไม่มีข้อความในคลิปบอร์ด', '⚠️');
+                }
+            } catch (err) {
+                setStatus('ไม่สามารถเข้าถึงคลิปบอร์ดได้', '❌');
+            }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            const result = outputText.value.trim();
+            if (!result) {
+                setStatus('ไม่มีผลลัพธ์ให้คัดลอก', '⚠️');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(result);
+                setStatus('คัดลอกผลลัพธ์แล้ว', '📋');
+                showCopyFeedback(copyBtn);
+            } catch (err) {
+                setStatus('ไม่สามารถคัดลอกได้', '❌');
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputText.value = '';
+            outputText.value = '';
+            inputText.focus();
+            setStatus('ล้างข้อมูลแล้ว', '🗑️');
+        });
+
+        selectAllBtn.addEventListener('click', () => {
+            if (outputText.value.trim()) {
+                outputText.select();
+                outputText.setSelectionRange(0, 99999); // For mobile
+                setStatus('เลือกข้อความทั้งหมดแล้ว', '📄');
+            }
+        });
+
+        // Auto convert on input change
+        inputText.addEventListener('input', () => {
+            if (inputText.value.trim()) {
+                performConversion();
+            } else {
+                outputText.value = '';
+                if (autoMode.checked) {
+                    detectedLang.textContent = 'ตรวจจับภาษาอัตโนมัติ';
+                    targetLang.textContent = 'แปลงอัตโนมัติ';
+                }
+                setStatus('พร้อมใช้งาน', '🟢');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', async (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'v':
+                        if (document.activeElement === inputText) {
+                            return; // Let default paste work
+                        }
+                        e.preventDefault();
+                        pasteBtn.click();
+                        break;
+                    case 'c':
+                        if (document.activeElement === outputText || 
+                            (document.activeElement !== inputText && outputText.value)) {
+                            e.preventDefault();
+                            copyBtn.click();
+                        }
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        performConversion();
+                        break;
+                    case 'l':
+                        e.preventDefault();
+                        clearBtn.click();
+                        break;
+                    case 'tab':
+                        e.preventDefault();
+                        autoMode.checked = !autoMode.checked;
+                        manualMode.checked = !manualMode.checked;
+                        toggleMode();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Enter' && document.activeElement === inputText) {
+                e.preventDefault();
+                performConversion();
+            }
+        });
+
+        // Language change handler
+        [fromLang, toLang].forEach(select => {
+            select.addEventListener('change', () => {
+                if (inputText.value.trim() && manualMode.checked) {
+                    performConversion();
+                }
+            });
+        });
+
+        // Click on output to copy
+        outputText.addEventListener('click', () => {
+            if (outputText.value.trim()) {
+                copyBtn.click();
+            }
+        });
+
+        // Initialize
+        setStatus('พร้อมใช้งาน', '🟢');
+        inputText.focus();
+    </script>
+</body>
+</html>
